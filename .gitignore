@@ -35,3 +35,5 @@ Thumbs.db
 # python files
 */__pycache__
 */.ipynb_checkpoints
+bikesim/.vs/
+bikesim/Build/

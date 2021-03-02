@@ -1,4 +1,6 @@
-﻿Shader "Procedural Toolkit/Unlit Color" {
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Procedural Toolkit/Unlit Color" {
 	Properties {
 		_Color ("Main Color", Color) = (1,1,1,1)
 	}
@@ -28,7 +30,7 @@
 			v2f vert (appdata v)
 			{
 				v2f o;
-                o.position = mul(UNITY_MATRIX_MVP, v.position);
+                o.position = UnityObjectToClipPos(v.position);
                 return o;
 			}
 			
