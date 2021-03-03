@@ -72,6 +72,12 @@ public class BicycleController : MonoBehaviour {
     private BicyclePose pose;
     private bool cameraRoll;
 
+    //Angel: manual control
+    private float speed = 0.0f;
+    private float yaw_speed = 0.0f;
+    private float roll_speed = 0.0f;
+
+
     // Setup the Bicycle Configuration
     void Start () {
 
@@ -99,7 +105,7 @@ public class BicycleController : MonoBehaviour {
         stopwatch = new System.Diagnostics.Stopwatch();
         pose = new BicyclePose();
 
-        serial.Start();
+        // serial.Start();
         timestamp = 0;
         stopwatch.Start();
     }
@@ -114,12 +120,41 @@ public class BicycleController : MonoBehaviour {
             cameraRoll = !cameraRoll;
         }
 
-        string gitsha1 = serial.gitsha1;
-        if (gitsha1 == null) {
-            gitsha1 = "null";
+        string gitsha1 = serial.gitsha1 ?? "null";
+
+        if (Input.GetKeyDown(KeyCode.UpArrow)) 
+            speed += 0.025f;
+        else if (Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            speed -= 0.025f;
+            if (speed < .0001f)
+                speed = 0f;
         }
 
-        pose = serial.PopBicyclePose();
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+            yaw_speed -= 0.001f;
+        else if (Input.GetKeyDown(KeyCode.RightArrow))
+            yaw_speed += 0.001f;
+        
+        if (Input.GetKeyDown(KeyCode.Home))
+            roll_speed += 0.01f;
+        else if (Input.GetKeyDown(KeyCode.PageUp))
+            roll_speed = -0.01f;
+
+        if (pose == null)
+            pose = new BicyclePose();
+
+        pose.yaw += yaw_speed;
+        pose.x += speed * (float) Math.Cos(pose.yaw);
+        pose.y += speed * (float)Math.Sin(pose.yaw);
+        pose.pitch = 0.0f;
+        pose.roll = 0.0f;
+        pose.rear_wheel = 0.0f;
+        pose.steer = 0.0f;
+
+        pose.timestamp = (ushort)stopwatch.ElapsedTicks;
+        
+        // pose = serial.PopBicyclePose();
         if (pose != null) {
             q.SetState(pose);
             // There is no operand to add between ushort in C#
